@@ -1,0 +1,260 @@
+idea 查找类中的方法ctrl+F12 或者alt+7
+git 账号825888210@qq.com
+liaole910516
+
+window 安装mysql
+1文件修改  配置my.ini
+[mysqld]
+character-set-server=utf8
+#绑定IPv4和3306端口
+bind-address = 0.0.0.0
+port = 3306
+sql_mode="STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION"
+
+default_storage_engine=innodb
+
+innodb_buffer_pool_size=1000M
+
+innodb_log_file_size=50M
+
+# 设置mysql的安装目录
+basedir=C:\Program Files\mysql-8.0.17-winx64  更改
+# 设置mysql数据库的数据的存放目录
+datadir=C:\Program Files\mysql-8.0.17-winx64\data 更改
+# 允许最大连接数
+max_connections=20
+# skip_grant_tables
+
+[mysql]
+default-character-set=utf8
+[mysql.server]
+default-character-set=utf8
+[mysql_safe]
+default-character-set=utf8
+二配置环境变量
+将path中环境变量增加C:\Program Files\mysql-8.0.17-winx64\bin
+三安装数据库操作
+mysqld --initialize 此时会生成一个新目录data，查看.err文件，可以看到root用户生成的随机密码；
+### mysqld –initialize-insecure自动生成无密码的root用户；
+
+mysqld --install [服务名]
+mysqld -remove移除自己的mysqld服务；
+net start mysql 
+net stop mysql
+sc delete MySQL/mysqld -remove卸载 MySQL 服务
+连接mysql
+mysql -uroot –p  输入刚才创建的随机密码；
+mysql -h localhost -u liaole -p
+输入密码
+
+alter user 'root'@'localhost' identified with mysql_native_password by '123456';
+//创建用户
+create user 'liaole'@'localhost' identified with mysql_native_password by '123456';
+//查看
+select user, host, plugin, authentication_string from user;
+//授权远程数据库授权所有权限 
+grant all privileges on *.* to 'liaole'@'localhost';
+#授权基本的查询修改权限，按需求设置
+grant select,insert,update,delete,create,drop,alter on *.* to 'liaole'@'localhost';
+
+desc 表名;
+show columns from 表名;
+describe 表名;
+show create table 表名;
+
+
+use information_schema
+select * from columns where table_name='表名';
+
+
+
+
+当配置不加上global 在某个仓库下执行bash 配置的就是当前仓库
+配置用户名：username
+git config --global user.name username
+配置邮箱：user@email
+git config --global user.email user@email
+配置密码
+git config --global user.password "123456(新的密码)"
+git config --global credential.helper store  
+该命令会记住密码，执行一次 git pull 或 git push 等需要输入密码的命令，输入一次密码。
+查看配置
+git config --list
+两种方式关联远程仓库
+1第一种使用git clone url 完全克隆的方式
+2第二种使用下面方式
+git init 初始化本地仓库
+git add 文件 git commit 提交
+git remote add origin git@github.com:yourName/yourRepo.git 这个是ssh地址使用这个关联
+
+-------------------
+echo "# notesbak" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/liaole-hyy/notesbak.git
+git push -u origin main
+----------------------https://github.com/liaole-hyy/notesbak.git
+替换本地改动
+假如你操作失误（当然，这最好永远不要发生），你可以使用如下命令替换掉本地改动：
+git checkout -- <filename>
+此命令会使用 HEAD 中的最新内容替换掉你的工作目录中的文件。已添加到暂存区的改动以及新文件都不会受到影响。
+假如你想丢弃你在本地的所有改动与提交，可以到服务器上获取最新的版本历史，并将你本地主分支指向它：
+git fetch origin
+git reset --hard origin/maste
+--------
+git 
+git init  执行后，会在当前目录下创建一个名为.git的隐藏文件夹
+git clone url  克隆或者下载仓库的项目
+git status  检查状态
+git add  加入暂时区
+git commmit 
+git commit -a -m"sssss" 可以在工作目录下使用
+git checkout
+git fetch
+git merge
+git pull 
+git push
+git reflog
+git reflog show master |head 5
+如果修改某一个文件（没有git add,之前提交过）,想撤销这次修改（确定没有任何作用?）
+相当于从暂存区检出 所以还原
+git checkout a.txt
+git log --pretty=oneline 查看提交日志
+如果修改某一个文件（git add 已在暂存区）,想撤销这次修改（确定没有任何作用?）
+git reset a.txt
+如果已修改某几个文件，但是想撤销到某个版本，但是当前暂存区、工作区不想撤销
+git reset --soft commitId
+如果修改了某几个文件也提交暂存区了，想撤销到某个commit（确定都不要了）其实还可以找回
+git reset --hard commitId
+回到某个版本
+git reset --hard master@{1}
+git revert
+git commit --amemd 提交不增加提交记录 覆盖最后一次提交记录的hash值
+git stash
+----------------------
+git ssh配置
+1.检查用户名和邮箱是否配置   ----------git config --global  --list 
+2.如果没有配置，则执行如下：
+git config --global  user.name "这里换上你的用户名"
+git config --global user.email "这里换上你的邮箱"
+3.生成秘钥
+ssh-keygen -t rsa -C "这里换上你的邮箱"
+4.在指定文件夹会生成,在指定的保存路径下会生成2个名为id_rsa和id_rsa.pub的文件
+
+
+--------------
+在IDEA中，我们会看到文件被标识着不同颜色：红色，绿色，蓝色。它们分别代表什么意思呢？
+    
+红色：未被版本控制的文件，即未添加到版本控制的文件，例如我们添加到ignore中的文件。
+
+绿色：新加入版本的文件，即我们新创建的文件，还未提交到远程仓库。
+
+蓝色：修改过的文件，即远程仓库中已有该文件，我们这次对它进行了修改，但是还未提交。
+
+
+
+消息中间件
+
+ActiveMQ
+java写的消息队列
+提供了丰富的客户端
+配置上使用的是对java和spring比较友好的xml
+可以作为一个jar包放到项目里，使用代码进行启动和配置
+支持复制集群
+工作模型
+	queue:生产者往queue发消息，消费者从queue取消息
+	topics:生产者往broker发消息，每个消息包含一个topic,消费者订阅自己感兴趣的topic
+支持mqtt,ssl
+单机吞吐量：万级
+时效性：ms级
+消息可靠性：丢失消息的概率比较低
+
+Rabbitmq
+erlang完成的，安装不到10M
+配置设施强大:实例,用户规划权限，监控系统
+也有topic和queue的概念，引入了exchange的概念
+exchange有四种：direct ,fanout,topic,header
+支持主从复制和集群
+已插件的形式支持mqtt,以及和spring整合
+单机吞吐量：万级
+时效性：微妙级（延迟低）
+可用性：高
+消息可靠性：基本不丢失
+功能支持：配套设施比较完备
+
+Kafka
+Scala实现，是一门可以运行在jvm上的语言
+kafka中只有topic
+kafka的topic中分区partition,并且分区是冗余存储的
+kafka中的消息在partition的存储是采用偏移量的机制，所以在同一个partition中
+消息消费的顺序是可以得到保证的
+kafka中消息的删除策略有两种，所以kafka支持重复消费
+	时间策略，相当于过期时间，过了这个时间就会自动删除
+	容量：超过了一定量，会把过早的消息删除
+kafka支持多个应用程序消费同一个主题的消息
+消费者要指出自己属于哪一个consumergroup,每个消费者都可以读取多个分区
+，但是一个分区在同一个consumergroup中只会被同一个消费者消费
+支持mqtt
+创建一个topic是一个很重的操作，kafka仅仅可以作为MQTT的输入
+kafka提供流式计算，可以做一些数据的初步清理
+--------------------------------------------------
+kafka windows 命令
+1.启动kafka cd E:\kafka_2.11-2.2.0\bin\windows\
+
+kafka-server-start.bat ..\..\config\server.properties
+
+2.创建topic 
+kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
+
+3.创建producer
+kafka-console-producer.bat --broker-list localhost:9092 --topic test
+
+4.创建消费者
+kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test --from-beginning
+
+5.查看consumer-groups
+kafka-consumer-groups.bat --list --bootstrap-server localhost:9092
+
+
+北向重仓股追踪 /stock/northcapital
+大盘管理 /stock/marketmanager
+二板股追踪 /stock/secondboard
+龙头股追踪 /stock/topstock
+趋势股追踪 /stock/trend
+优质指数/ETF追踪 /stock/indexmark
+著名游资股追踪 /stock/hotcapital
+高价次新股追踪 /stock/newhighprice
+模式管理 /stock/modemanager
+模式概率计算 /stock/modeprobability
+操作亏损记录 /stock/operateloss
+
+ConfigureableWebServerApplicationContext
+
+ServletWebServerApplicationContext
+
+AnnotationConfigServletWebServerApplicationContext 
+
+nacos 10.1.77.28:8848 nacos/meChL5Yj47
+apigateway_dashboard(konga) 10.1.77.28:1337 admin/uFmwe2SyCyM2E6n
+apigateway(kong) 10.1.77.30:8001
+idgen 10.1.77.30
+reconciliation 10.1.77.30
+dashboard-frontend 10.1.77.31
+compensate 10.1.77.31
+dashboard-backend 10.1.77.31 17621235276/8oqx8wUFh
+account 10.1.77.32
+mch-application 10.1.77.32
+bank-gateway 10.1.77.32
+report 10.1.77.34
+trade 10.1.77.34
+
+Excel快速切换sheet快捷键ctrl+PgUp / ctrl+PgDn
+
+vmware workstation 10序列号：
+0Y6DK-8H1DH-UZ249-X2A5M-3AM2M
+http://mirror.nsc.liu.se/centos-store/6.7/isos/x86_64/
+
+root
+@liaole123456

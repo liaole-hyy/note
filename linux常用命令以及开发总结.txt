@@ -1,0 +1,321 @@
+常用三个端口 ssh 端口 22 http 80 https 443
+1.关闭SElinux, 配置防火墙
+
+vi /etc/selinux/config
+
+#SELINUX=enforcing #注释掉
+
+#SELINUXTYPE=targeted #注释掉
+
+SELINUX=disabled #增加
+
+:wq!  #保存退出
+
+setenforce 0 #使配置立即生效
+
+
+使用systemctl工具来管理服务程序，包括了service和chkconfig
+systemctl list-unit-files|grep enabled 
+
+2.关闭默认防火墙
+
+systemctl stop firewalld.service #停止firewall
+systemctl disable firewalld.service #禁止firewall开机启动
+firewall-cmd --state #查看默认防火墙状态（关闭后显示notrunning，开启后显示running）
+
+启动一个服务：systemctl start firewalld.service
+关闭一个服务：systemctl stop firewalld.service
+重启一个服务：systemctl restart firewalld.service
+显示一个服务的状态：systemctl status firewalld.service
+在开机时启用一个服务：systemctl enable firewalld.service
+在开机时禁用一个服务：systemctl disable firewalld.service
+查看服务是否开机启动：systemctl is-enabled firewalld.service;echo $?
+systemctl get-default //获取当前系统启动模式
+systemctl set-default graphical.target由命令行模式更改为图形界面模式
+systemctl set-default multi-user.target由图形界面模式更改为命令行模式
+
+3.安装lrzsz服务
+yum install ssh
+yun -y install wget
+yum install lrzsz
+yum install libaio* sudo命令可以使用
+yum install -y initscripts
+安装telnet  
+yum install telnet nmap dos2unix -y
+4.移除服务
+yum remove iptables
+
+5查看某个服务是否启动
+ps aux|grep nginx
+ps -ef |grep tomcat
+netstat -anp | grep 80 //查看带有80启动的端口
+lsof -i:30000
+env  显示所有变量
+6启动mysql
+./bin/mysql -u root -p
+jps -lmv 查看java当前jvm参数
+7 需找某个文件
+find / -name mysql.sock
+scp /home/ixdba/etc.tar.gz root@192.168.60.168:/tmp
+scp -r /home/tomcat/webapps/QNCms/attached/image/20180427 root@118.31.34.7:/home/tomcat/webapps/QNCms/attached/image
+8 删除文件目录里面所有文件
+rm -rf 目录
+
+更改文件属性组和属主
+chgrp [-R] 属组名文件名 
+chown [–R] 属主名 文件名
+chown [-R] 属主名：属组名 文件名
+ls cd pwd mkdir rmdir cp rm 
+rename a b 重命名mv 6379.conf redis.conf
+ls -lh 查看文件大小
+du -sh * 查看目录下面文件夹的大小
+查看硬盘大小使用率
+df -hl
+查看内存大小
+cat /proc/meminfo | grep MemTotal
+
+末行模式删除：:.,$d
+解压
+(1) *.tar 用 tar –xvf 解压
+(2) *.gz 用 gzip -d或者gunzip 解压
+(3) *.tar.gz和*.tgz 用 tar –xzf 解压
+(4) *.bz2 用 bzip2 -d或者用bunzip2 解压
+(5) *.tar.bz2用tar –xjf 解压
+(6) *.Z 用 uncompress 解压
+(7) *.tar.Z 用tar –xZf 解压
+(8) *.rar 用 unrar e解压
+(9) *.zip 用 unzip 解压
+(10) *.xz 用 xz -d 解压
+(11) *.tar.xz 用 tar -zJf 解压
+压缩
+tar -cvf jpg.tar *.jpg
+tar -czf jpg.tar.gz *.jpg
+tar -cjf jpg.tar.bz2 *.jpg 
+tar -cZf jpg.tar.Z *.jpg
+rar a jpg.rar *.jpg 
+zip jpg.zip *.jpg 
+绝对路径：
+路径的写法，由根目录 / 写起，例如： /usr/share/doc 这个目录。
+相对路径：
+路径的写法，不是由 / 写起，例如由 /usr/share/doc 要到 /usr/share/man 底下时，可以写成： cd ../man 这就是相对路径的写法啦！
+
+9系统关闭
+sync 将数据由内存同步到硬盘中。
+
+shutdown 关机指令，你可以man shutdown 来看一下帮助文档。例如你可以运行如下命令关机：
+
+shutdown –h 10 ‘This server will shutdown after 10 mins’ 这个命令告诉大家，计算机将在10分钟后关机，并且会显示在登陆用户的当前屏幕中。
+
+Shutdown –h now 立马关机
+
+Shutdown –h 20:25 系统会在今天20:25关机
+
+Shutdown –h +10 十分钟后关机
+
+Shutdown –r now 系统立马重启
+
+Shutdown –r +10 系统十分钟后重启
+
+reboot 就是重启，等同于 shutdown –r now
+
+halt 关闭系统，等同于shutdown –h now 和 poweroff
+
+linux注册服务　
+分为两种　一个系统服务　一种是应用服务
+都可以设置开启启动
+systemctl 
+
+
+网络命令
+ vi /etc/sysconfig/network-scripts/ifcfg-eth0 //修改ip
+ps -A 显示所有进程
+pstree 显示进程的树状图。
+
+杀进程顺序  grep 所有的意思
+a.首先用ps 查看进程
+ps -ef
+ps -aux | grep nginx 查看进程 
+netstat -anp | grep 80  查看端口
+kill -s 9 pid
+/lib/systemd/system systemctl命令
+/usr/local/nginx/sbin/nginx
+/usr/local/nginx/conf/nginx.conf
+重启命令：
+1、reboot
+2、shutdown -r now 立刻重启(root用户使用)
+3、shutdown -r 10 过10分钟自动重启(root用户使用) 
+4、shutdown -r 20:35 在时间为20:35时候重启(root用户使用)
+如果是通过shutdown命令设置重启的话，可以用shutdown -c命令取消重启
+
+关机命令：
+1、halt   立刻关机
+2、poweroff  立刻关机
+3、shutdown -h now 立刻关机(root用户使用)
+4、shutdown -h 10 10分钟后自动关机
+---------------------------------------------------
+查看日志
+参数： 
+tail [ -f ] [ -c Number | -n Number | -m Number | -b Number | -k Number ] [ File ] 
+参数解释： 
+-f 该参数用于监视File文件增长。 
+-c Number 从 Number 字节位置读取指定文件 
+-n Number 从 Number 行位置读取指定文件。 
+-m Number 从 Number 多字节字符位置读取指定文件，比方你的文件假设包括中文字，假设指定-c参数，可能导致截断，但使用-m则会避免该问题。 
+-b Number 从 Number 表示的512字节块位置读取指定文件。 
+-k Number 从 Number 表示的1KB块位置读取指定文件。 
+File 指定操作的目标文件名称 
+上述命令中，都涉及到number，假设不指定，默认显示10行。Number前面可使用正负号，表示该偏移从顶部还是从尾部開始计算。 
+tail可运行文件一般在/usr/bin/以下。
+1、tail -f filename  
+说明：监视filename文件的尾部内容（默认10行，相当于增加参数 -n 10），刷新显示在屏幕上。退出，按下CTRL+C。  
+
+2、tail -n 20 filename  
+说明：显示filename最后20行。  
+
+3、tail -r -n 10 filename  
+说明：逆序显示filename最后10行。
+head 仅仅显示前面几行  
+
+head -n 10  test.log   查询日志文件中的头10行日志;  
+
+head -n -10  test.log   查询日志文件除了最后10行的其他所有日志;  
+grep [options]  
+主要参数:  
+[options]主要参数：  
+－c：只输出匹配行的计数。  
+－I：不区分大 小写(只适用于单字符)。  
+－h：查询多文件时不显示文件名。  
+－l：查询多文件时只输出包含匹配字符的文件名。  
+－n：显示匹配行及 行号。  
+－s：不显示不存在或无匹配文本的错误信息。  
+－v：显示不包含匹配文本的所有行。  
+pattern正则表达式主要参数：  
+： 忽略正则表达式中特殊字符的原有含义。  
+^：匹配正则表达式的开始行。  
+$: 匹配正则表达式的结束行。  
+<：从匹配正则表达 式的行开始。  
+>：到匹配正则表达式的行结束。  
+[ ]：单个字符，如[A]即A符合要求 。  
+[ - ]：范围，如[A-Z]，即A、B、C一直到Z都符合要求 。  
+。：所有的单个字符。  
+ - ：有字符，长度可以为0。
+ cat主要有三大功能：  
+1.一次显示整个文件。$ cat filename  
+2.从键盘创建一个文件。$ cat > filename   
+  只能创建新文件,不能编辑已有文件.  
+3.将几个文件合并为一个文件： $cat file1 file2 > file  
+
+参数：  
+-n 或 --number 由 1 开始对所有输出的行数编号  
+-b 或 --number-nonblank 和 -n 相似，只不过对于空白行不编号  
+-s 或 --squeeze-blank 当遇到有连续两行以上的空白行，就代换为一行的空白行  
+-v 或 --show-nonprinting  
+例：  
+把 textfile1 的档案内容加上行号后输入 textfile2 这个档案里  
+cat -n textfile1 > textfile2  
+
+把 textfile1 和 textfile2 的档案内容加上行号（空白行不加）之后将内容附加到 textfile3 里。  
+cat -b textfile1 textfile2 >> textfile3  
+
+把test.txt文件扔进垃圾箱，赋空值test.txt  
+cat /dev/null > /etc/test.txt   
+注意：>意思是创建，>>是追加。千万不要弄混了。
+混合使用命令
+A.  tail web.2016-06-06.log -n 300 -f  
+    查看底部即最新300条日志记录，并实时刷新      
+
+B.  grep 'nick' | tail web.2016-04-04.log -C 10   
+    查看字符‘nick’前后10条日志记录, 大写C  
+
+C.  cat -n test.log |tail -n +92|head -n 20  
+    tail -n +92表示查询92行之后的日志  
+    head -n 20 则表示在前面的查询结果里再查前20条记录  
+------------------------------------------------------
+解决虚拟机访问外网
+1.配置DNS
+
+vim   /etc/resolv.conf
+
+nameserver 192.168.0.1 
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+
+1.阿里云服务器1M带宽最多能支持多少人同时在线？
+公式：带宽X等待时间/页面大小=并发人数
+首先我们计算1M带宽在8S中之内能传送多少个60KB的页面，1024*8/60=136.53 也就是大约为137个。
+这意味着，如果每一个用户都愿意等到极限的8秒钟，那么我们可以满足137个人同时在线。如果想要每个人平均等1秒钟的话，
+这个数字大概是17（1024*1/60)。按照这个公式，如果你的服务器是5M带宽的话，它支持的最大并发数是1024*5*8/60=683.也就是5M带宽的服务器支持的最大支持683个人同时在线。
+
+
+
+---开发组件总结
+1.quartz集群重复性问题 通过同一个数据库来管理
+Quartz通过启动两个维护线程来维护数据库状态实现集群管理，一个是检测节点状态线程，一个是恢复任务线程
+配置
+org.quartz.scheduler.instanceName = MyClusteredScheduler  
+org.quartz.scheduler.instanceId = AUTO   每个
+org.quartz.jobStore.isClustered = true  
+
+当一个任务在指定时间还没有执行完时间到了触发了任务执行策略通过配置
+ org.quartz.jobStore.misfireThreshold = 60000   1分钟
+表示如果某个任务到达执行时间，而此时线程池中没有可用线程时，任务等待的最大时间，
+如果等待时间超过下面配置的值(毫秒)，本次就不在执行，而等待下一次执行时间的到来，可根据任务量和负责程度来调整  
+
+DisallowConcurrentExecution 不允许并发执行
+
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=static
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=ens33
+#UUID=25f0107e-2a2a-4926-90cd-8101f496d5bf
+DEVICE=ens33
+ONBOOT=yes
+IPADDR=192.168.3.130
+NETMASK=255.255.255.0
+GATEWAY=192.168.3.1
+-------------------------------------------------
+redis
+*#JDF*&^@($)NID
+/usr/local/redis/src/redis-server /usr/local/redis-data/redis.conf redis启动
+./redis-cli -h 127.0.0.1 -p 6379 -a myPassword redis 客户端连接
+flushall 清空所有数据
+---------------------------------------------------
+微信前端启动
+npm install
+npm run build
+npm run dev
+
+----jvm 服务器卡死或者访问慢问题排查
+
+流程 
+应用程序变慢 --> 找到服务器资源占用较多的进程 
+1.内存原因  分析内存堆 
+2.线程原因  分析线程栈  
+找出解决原因
+df -h 磁盘空间
+free -m  查看内存
+使用jps 查看当前运行中java进程
+top -d20 查看所有进程id
+top -p pid  通过进程ID查询所占用的CPU、内存以及当前负载情况。
+ps -mp 18139 -o THREAD,tid,time
+printf "%x\n" 18198
+排查线程栈，使用jstack命令
+jstack <pid> | grep -a 3d30
+jstack <pid> | grep 3d30 -A 90
+http://www.zqwt360.com/fyApi/serchOrder.html?order_id=FY20180214115505343
+
+文件目录查看
+ls 这时候会以最简洁的方式显示当前目录下的文件夹及文件，适用于想快速了解当前目录下有哪些文件，占用屏幕空间小，显示内容多。
+ls -l”回车，这时候会以详细列表的方式显示所有内容，包括权限，用户，所属组，文件大小，名称，创建日期时间等。
+ls -la”回车，这是一个选项组合，-a表示显示隐藏的文件，组合起来就是既显示详细列表，又显示隐藏文件。
+文件名称首字符为“.”表示一个隐藏文件。
+ls -lah”回车，这次再加上一个选项，-h表示以合适的单位显示文件，普通情况下，linux都以字节数显示文件大小，很难一目了然知道。
+加上此选项之后，就会以KB，MB等我们熟悉且直观的单位显示文件大小了。

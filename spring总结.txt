@@ -1,0 +1,159 @@
+做对事不如跟对人，选择比努力重要，环境也比努力重要，人这在努力的时候最好方式 跟对人做对事
+
+复杂的事情简单做，你就是专家；简单的事情重复做，你就是行家；重复的事情用心做，你就是赢家。 
+
+
+ThreadLocal对象总结
+比较以上两种情况,我们就会发现:
+内存泄漏的发生跟 ThreadLocalIMap 中的 key 是否使用弱引用是没有关系的。那么内存泄漏的的真正原因是什么呢？
+在以上两种内存泄漏的情况中．都有两个前提：主要两个原因
+1 . 没有手动侧除这个 Entry
+2 . CurrentThread 当前线程依然运行
+解释如下
+第一点很好理解，只要在使用完下 ThreadLocal ，调用其 remove 方法删除对应的 Entry ，就能避免内存泄漏。
+第二点稍微复杂一点，由于ThreadLocalMap 是 Thread 的一个属性，被当前线程所引用，
+所以ThreadLocalMap的生命周期跟 Thread 一样长。那么在使用完 ThreadLocal 的使用，如果当前Thread 也随之执行结束，
+ThreadLocalMap 自然也会被 gc 回收，从根源上避免了内存泄漏。
+
+那么为什么key要用弱引用呢？
+事实上，在 ThreadLocalMap 中的set/getEntry 方法中，会对 key 为 null（也即是 ThreadLocal 为 null ）进行判断
+，如果为 null 的话，那么会把 value 置为 null 的．
+​这就意味着使用完 ThreadLocal , CurrentThread 依然运行的前提下．就算忘记调用 remove 方法，弱引用比强引用可以多一层保障：
+弱引用的 ThreadLocal 会被回收．对应value在下一次 ThreadLocaIMap 调用 set/get/remove 中的任一方法的时候会被清除，
+从而避免内存泄漏．
+
+
+spring中编程思想
+
+1.OOP  面向对象
+2.BOP  面向bean
+3.AOP  面向切面
+4.IOC  控制权反正
+5.DI/DL 依赖注入(对象赋值)，依赖查找 有bean容器
+
+赋值方式
+构造，set,属性直接赋值
+
+v1.x 注解驱动启蒙时代
+v2.0 注解驱动过度时代
+v2.5 引入新骨架时代
+v3.x 注解驱动黄金时代
+v4.x 注解驱动完善时代
+v5.x 注解驱动成熟时代
+
+spring5 注解编程基础组件
+
+Annotation API
+
+1.配置组件
+@Configuration
+@ComponentScan
+@Scope  
+@Lazy  主要应用在单例条件下，用时在创建，多例下无用，多例是用的时候创建
+@Conditional
+@Import  三种方式 1. @Import导入 ，2. 实现ImportSelector自定义规则实现，3实现ImportDeanDefinitionRegistrar 4.封装成FactoryBean
+生命周期  1.配置@bean的参数  2分别实现InitializingBean和DisposableBean接口 @PostConstruct @PreDestory
+@PostConstruct 
+@PreDestory
+@DependsOn
+
+2.赋值组件
+@Component
+@Service 
+@Controller
+@Repository
+@Value
+@Autorwied
+@PropertySource
+@Qualifier  如存在多个实例配合使用
+@Primary   自动装配时当出现多个bean候选者时，被注解@Primary的Bean将作为首选者，否则抛弃异常
+@Resource 默认按名称装配，当找不到与名称匹配的bean才按类型装配
+
+3.织入组件
+ApplicationContextAware
+BeanDefinitionRegistryPostProcessor;
+
+4.切面组件
+@EnableTransactionManagement
+@Transational
+
+300行手写spring源码v1.0
+1.定位，2加载 3注册，4自动依赖注入5mvc初始化 6 dispatch分发
+
+顶层类设计相关（如下顶层类的分离抽象）
+BeanFactory
+
+ListableBeanFactory
+AutowireCapableBeanFactory
+HierarchicalBeanFactory
+
+ApplicationContext
+
+WepApplicationContext FileSystemXmlApplicationContext ClassPathXmlApplicationConext AnnotationConfigApplicationContext
+
+Map容器
+
+Factory工厂
+
+BeanDefinition 元信息,配置，这里配置形式有xml,yml,annatation、properties
+
+Bean实例，反射实例化Object
+这里存在原生的Bean,代理的Bean
+封装在 BeanWrapper 包装器模式
+
+Reader解析器
+
+Context上下文
+30类手写三级缓存
+spring bean的三级缓存（通过构造函数注入的不能解决循环依赖，非单例的，不支持循环依赖）
+
+一级缓存:已经完成了依赖注入的bean
+
+二级缓存:早期的纯净bean
+
+三级缓存:终极缓存，为aop动态代理
+
+顶层类手写spring MVC 
+
+Servlet MVC核心初始化方法
+initStrategies(ApplicationContext context){
+   //多文件上传组件
+   initMultipartResolver(context);
+   //初始化本地语言环境
+   initLocaleResolver(context);
+   //初始化模板处理器
+   initThemeResolver(context);
+   //handlerMappings
+   initHandlerMappings(context);
+   //初始化参数适配器
+   initHandlerAdapters(context);
+   //初始化异常拦截器
+   initHandlerExceptionResolvers(context);
+   //初始化视图预处理
+   initRequestToViewNameTranslator(conext);
+   //初始化视图转换器
+   initViewResolvers(context);
+   //FlashMap管理器
+   initFlashMapManager(context);
+}
+1.找到对应HandlerMapping
+2.找到对应HandlerAdapter
+3.ha.handle()找到对应的ModelAndView
+4.ViewResovler找到对应的view对象
+5.view.render();
+
+抽象类 
+DispatcherSerlvet
+HandlerMapping
+HandlerAdapter
+ModealAndView
+ViewResolver 氛围
+
+spring AOP 
+AOP 解决了硬编码，可以解决日志监控，权限控制，事务控制....
+AdvisedSupport 工具类:解析AOP配置信息，并且构建切面与切点之间的关系
+AopConfig保存AOP的配置信息
+Adivce 通知，完成切面回调封装
+JdkDynamicAopProxy 使用jdk生成代理类的工具
+CglibAopProxy 使用Cglib生成代理类的工具
+DefaultAopProxyFactory

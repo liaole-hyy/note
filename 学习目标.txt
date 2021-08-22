@@ -1,0 +1,322 @@
+目标
+
+1.gradle
+
+2.kong 
+
+3.ELK :
+https://www.cnblogs.com/zsql/p/13164414.html
+4.EZT梳理
+
+swagger编辑器 快速开发restful接口定义
+
+分布式文件存储系统Ceph
+
+
+
+mvn install:install-file -Dfile=D:\ChromeCoreDownloads\WxPayAPI_JAVA\java_sdk_v3.0.9\target\wxpay-sdk-3.0.9.jar -DgroupId=com.github.wxpay -DartifactId=wxpay-sdk -Dversion=3.0.9 -Dpackaging=jar
+
+
+网关鉴权涉及内容比较多，分析一下
+1.身份识别 这里的身份识别是指用户登录信息识别，很久以前用session,而微服务用jwt令牌
+2.身份鉴权 用户是否有权限访问当前指定方法
+3.鉴权位置 微服务网关中鉴权，还是在每个微服务鉴权
+4.鉴权类别
+ a.功能权限
+ b.数据权限， 复杂系数非常高，适合金融系统或者大型ERP系统
+
+
+JWT令牌
+用户每次访问后台的时候，如果时一些需要认证链接，都需要识别用户身份，比如抢单，用户中心等，在传统项目中用的都是session,
+但是在微服务不建议用session，使用jwt令牌
+
+初识JWT令牌
+jwt简称json web token ,也就是通过json形式作为web应用令牌，在各方之间安全的将信息作为json对象传输，在数据传输过程中还可以
+完成数据加密，签名相关处理
+
+jwt令牌作用
+身份授权：这是使用jwt的最常见方案，一旦用户登录，每个后续请求将包括jwt，从而允许用户访问该令牌允许路由，服务和资源，
+单点登录是的当今广泛的使用jwt的一项功能，因为他的开销小，并且可以在不同的域中使用
+
+信息交换：jwt令牌在各方面之间安全的传输信息的方法，因为可以对jwt进行签名，所以您可以确保发件人是他们所说的人，此外由于签名
+是使用标头和有效负载计算，因此可以验证内容是否遭到篡改
+
+json数据保存在客户端
+
+jwt令牌校验优势
+1.简洁（compact）：可以通过url,post参数或者在http header中发送，因为数据量小，所以传输的速度也快
+2.自包含（self-contained)：负载中包含了所有用户所需要的信息，避免了多次查询数据库
+3.因为token是以json加密的形式保存在客户端，所以jwt跨语言，原则上任何web形式都支持
+4.不在服务端保存信息，特别适合分布式微服务
+
+jwt令牌结构
+header、payload、signature,以.进行连接
+header
+1.通常由两部分组成:令牌的类型和所使用的签名算法 hmac,sha265,或rsa,它会使用base64编码组成jwt结构一部分
+2.注意:base 64是一种编码，也就是说，他是可以被翻译回原来的样子，他不是一种加密过程
+3.{"alg"："hs3645","typ":"JWT"}
+
+Payload：
+1：令牌的第二部分是有效负载，其中包含声明，声明有关实体（通常是指用户）和其他数据的声明。同样的他会使用Base64编码组成
+JWT结构的第二部分
+2：{"sub":"1234678","name"："John Doe","admin"：true}
+
+3.Signature：
+1.前面两部分都是使用base64进行编码的，即前端可以解开知道里面的信息，Signature需要使用编码后header和payLoad以及我们提供的
+一个秘钥，然后使用header中指定的签名算法（Hs256）进行签名，没有被篡改过
+2如HMACSHA256(base64UrlEncode(header)+"."+base64UrlEncode(payload).secret)
+
+令牌为了安全 绑定ip 以及数据加密
+
+在创建JWT令牌的时候，会有很多属性需要填写，关于JWT令牌中一些属性，我们说明一下:
+iss: jwt签发者
+sub: 主题
+aud: 接收jwt的一方
+exp: jwt的过期时间，这个过期时间必须要大于签发时间
+nbf: 定义在什么时间之前，该jwt都是不可用的
+iat: jwt的签发时间
+jti: jwt的唯一身份标识，主要用来作为一次性token,从而回避重放攻击
+
+
+
+
+Sentinel 限流，熔断降级
+
+主要以流量为切入点，从限流，流量整形，熔断降级，系统负载保护，热点防护等多个维度来帮助开发者
+保护微服务的稳定性
+
+Lvs+Nginx集群 实现百万并发架构，可以处理接收百万并发客户端请求代理，后端处理多强 
+
+1)Sentinel核心组件
+1.核心库（java客户端）:不依赖任何框架/库,能够运行在java 7以及以上版本的运行环境，同时对Dubbo/Spring cloud
+等框架也有较好的支持
+
+2.控制台（Dashboard）:控制台主要负责管理推送规则、监控、集群限流分配管理，机器发现等
+
+
+Sentinel vs Hystrix
+对比内容			Sentinel				Hystrix
+隔离策略		信号量隔离				线程池隔离/信号量隔离
+熔断降级策略		基于响应时间/失败比率			基于失败比率
+实时指标实现		滑动窗口				滑动窗口（基于Rxjava）
+规则配置		支持多种数据源				支持多种数据源
+扩展性			多个扩展点				插件形式
+基于注解的支持		支持					支持	
+限流			基于QPS,支持基于调用关系的限流		不支持
+流量整形		支持慢启动，均速器模式			不支持
+系统负载保护		支持					不支持
+控制台			开销即用，可配置规则，查看秒级监控，机器发现	不完善
+常见框架的适配		Servlet,Spring cloud dubbo,grpc		Servlet,SpringCloud NetFlix
+
+3.Sentinel基本概念
+1.资源
+资源是 sentinel 的关键概念，它可以是Java应用程序中的任何内容，例如，由应用程序提供的服务或应用程序调用的其他
+应用提供的服务，甚至可以是一个代码
+
+只要通过Sentiel APi定义的代码就是资源，能够被sentinel 保护起来。大部分情况下，可以使用方法签名，url甚至服务名称
+作为资源名来标识资源
+
+2.规则
+围绕资源的实时状态设定规则，可以包括流量控制规则，熔断降级规则以及系统保护规则，所有规则可以动态调整。
+
+4.流量控制从以下几个角度
+资源的调用关系，例如资源的调用链路，资源和资源之间的关系
+运行指标，例如qps,线程池，系统负载
+控制效果，例如直接限流（丢弃），冷启动，排队等
+
+
+后续学习目标环境搭建
+redis
+1.redis集群搭建
+2.redis扩容，缩容
+
+lvs+nginx集群搭建与学习
+微服务链路跟踪之SkyWalking实战小结
+https://blog.csdn.net/xianyuxiaoqiang/article/details/98209563
+
+mysql-主从复制
+https://blog.csdn.net/qq_15092079/article/details/81672920
+ X.OueGYBV7j%
+>BneGdPlp2i
+Lvs介绍
+LVS(linux Virtual Server)即Linux虚拟服务器。它用于多服务器的负载均衡，工作在网络四层
+可以实现高性能，高可用的服务器集群技术，它稳定可靠，即使在集群的服务器中某台服务器无法
+正常工作，也不影响整体效果。是基于TCP/IP做的路由和转发，稳定性和效率极高
+
+Lvs负载均衡模式
+lvs提供了3种负载均衡模式，每种负载均衡模式适用的场景差异、
+
+1.NAT模式
+用户请求到分发器后，通过预设的iptables规则，把请求的数据包转发到后端的RS上去，RS需要设定网关为分发器的内网ip。
+用户请求的数据包和返回给用户的数据包全部经过分发器，所以分发器称为瓶颈。在NAT模式中，只需要分发器有公网IP即可，
+所以比较节省公网ip资源
+
+
+2.TUN
+这种模式需要有一个公共的ip配置在分发器和所有RS上，我们把它叫做vip.客户端请求的目标ip为VIP,分发器接收到请求
+数据包后，会对数据包做一个加工，会把目标ip改为RS的ip,这样数据包就到了RS上，RS接受数据包后，会还原原始数据包，
+这样目标ip为vip,因为所有RS上配置了这个VIP,所以他会认为是它自己,这里VIP分发走了外网，分发的性能会受到限制
+
+3.DR模式
+和IP Tunnel较为像似，不同的是，它会把数据包的mac地址修改为RS的MAC地址。真实服务器将响应直接返回给客户。
+这种方式没有ip隧道的开销，对集群中的真实服务器也没有必须支持ip隧道协议的要求，但是要求调度器与真实服务器，
+都有一块网卡连在同一个物理网段上
+
+Lvs DR模式配置
+
+综合上面的分析，我们可以得出结论，DR模式性能效率比较高，安全性很高，因此一般公司都推荐使用DR模式，我们这里也配置了DR模式
+实现Lvs+Nginx集群
+
+我们准备3台机器
+1:192.168.5.128 (DS) （对外提供服务）
+2:192.168.5.129 (RS) （处理真实服务）
+3:192.168.5.130 (RS) （处理真实服务）
+
+VIP:192.168.5.150
+
+2.1 vip配置
+关闭网络配置管理器(每台机器都要做)
+systemctl stop NetworkManager
+systemctl disable NetworkManager
+
+配置虚拟ip(vip)
+在 /etc/sysconfig/network-scripts创建文件ifcfg-ens33:1,
+cp ifcfg-ens33 ifcfg-ens33:1
+内容如下
+BOOTPROTO=static
+DEVICE=ens33:1
+ONBOOT=yes
+IPADDR=192.168.5.150
+NETMASK=255.255.255.0
+
+重启网络服务:
+service network restart
+
+2.2RS绑定虚拟vip
+在 /etc/sysconfig/network-scripts创建文件ifcfg-lo:1
+cp ifcfg-lo ifcfg-lo:1
+vi ifcfg-lo:1 需要更改内容如下
+DEVICE=lo:1
+IPADDR=192.165.5.150
+NETMASK=255.255.255.255
+
+执行刷新:ifup lo:1
+查看:ip addr
+
+2.3LVS集群管理工具安装（DS服务器安装即可）
+ipvsadm用于对lvs集群进行管理，需要手动安装
+安装命令
+yum install ipvsadm
+
+版本查看
+ipvsadm -Ln
+
+效果如下
+
+2.4地址解析协议
+arp_ignore和arp_announce参数都和ARP协议相关，主要用于控制系统返回arp响应和发送arp请求时的动作。
+这两个参数很重要，特别是在LVS的DR场景下，它们的配置直接影响到DR转发是否正常
+
+arp-ignore: arp_ignore参数的作用是控制系统在收到外部arp请求时,是否要返回arp响应（0~8，
+2~8用的很少）
+DS新增如下配置
+配置文件: /etc/sysctl.conf,将如下文件拷贝进去
+net.ipv4.conf.all.arp_ignore = 1
+net.ipv4.conf.default.arp_ignore = 1
+net.ipv4.conf.lo.arp_ignore = 1
+net.ipv4.conf.all.arp_announce = 2
+net.ipv4.conf.default.arp_announce = 2
+net.ipv4.conf.lo.arp_announce = 2
+
+刷新配置
+sysctl -p
+
+RS中新增如下配置
+添加路由:此时如果无法识别route,需要安装相关工具，yum install net-tools
+route add -host 192.168.5.150 dev lo:1
+
+添加了一个host地址，目的是用于接收数据报文，接收到了数据报文后交给lo:1处理。
+(防止关机失效，需要将上述命令添加到/etc/rc.local中)
+
+添加完host后，可以查看一下: route -n ,能明显看到效果
+
+2.5集群配置
+ipvsadm命令详解
+
+ipvsadm -A:用于创建集群
+ipvsadm -E:用于修改集群
+ipvsadm -D:用于删除集群
+ipvsadm -C:用于清楚集群数据
+ipvsadm -R:用于重置集群配置规则
+ipvsadm -S:用于保存修改的集群规则
+ipvsadm -a:用于添加一个rs节点
+ipvsadm -e:用于修改一个rs节点
+ipvsadm -d:用于删除一个rs节点
+
+添加集群TCP服务地址:(外部请求由该配置指定的VIP处理)
+
+ipvsadm -A -t 192.168.5.150:80 -s rr
+参数说明
+-A:添加集群配置
+-t：TCP请求地址(VIP)
+-s: 负载均衡算法
+
+负载均衡算法
+算法				说明
+rr	轮询算法，它将请求依次分配给不同的rs节点，也就是RS节点中均摊分配，这种算法简单,但只适合于RS节点
+	处理性能差不多的情况
+
+wrr     加权轮询调度，它将依据不同RS的权值分配任务。权值较高的RS将优先获得任务，并且分配到的连接数将比
+	权值低的RS更多。相同权值的RS得到相同数目的连接数。
+Wlc	加权最小连接数调度，假设各台RS的全职依次为Wi,当前tcp连接数依次为Ti,依次去Ti/Wi为最小的RS作为下
+	一个分配的DS
+Dh      目的地址哈希调度，以目的地址为关键字查找一个静态hash表来获得需要的RS
+SH      源地址哈希调度以源地址为关键字查找一个静态hash表来获得需要RS
+Lc	最小连接数调度，IPVS表存储了所有活动连接。LB会比较将连接请求发送到当前连接最少的RS
+Lblc    基于地址的最小连接数调度:将来自同一个目的地址的请求分配给同一台RS，此时这台服务器是尚未满负荷的。
+	否则就将这个请求分配给连接数最小的RS，并以它作为下一次分配的首先考虑
+
+配置rs(2个)节点
+ipvsadm -a -t 192.168.5.150:80 -r 192.168.5.129:80 -g
+ipvsadm -a -t 192.168.5.150:80 -r 192.168.5.130:80 -g
+
+参数说明:
+-a: 给集群添加一个节点
+-t: 指定vip地址
+-r: 指定真是服务器地址
+-g: 表示LVS的模式为dr模式
+
+集群列表客户端请求数据和TCP通信数据会持久化保存，为了看到更好效果，时间设置成2秒保存
+ipvsadm --set 2 2 2
+查看列表
+ipvsadm -Lnc
+
+alibaba easyexcel
+
+change master to master_host='192.168.5.129',master_port=3306,master_user='masterbackup',master_password='123456',master_log_file='master-bin.000001',master_log_pos=154;
+
+
+//破碎的多线程版本
+//“Double-Checked Locking”成语 这种写法会有问题，编译重排序，解放方式 Helper修饰为volatile
+class Foo {
+	private Helper helper = null;
+	public Helper getHelper（）{
+	if（helper == null）
+		synchronized（this）{
+			if（helper == null）
+				helper = new Helper（）;
+			}
+			回报助手;
+	}
+	//其他功能和成员......
+}
+
+block
+jvm学习 https://www.cnblogs.com/chanshuyi/p/jvm_serial_00_why_learn_jvm.html
+
+五种 IO模型
+阻塞IO模型:硬件到系统内核，阻塞，系统内核到程序空间，阻塞。
+非阻塞IO模型:硬件到系统到内核，轮询阻塞。系统内核到程序空间，阻塞。
+复用IO模型:硬件到系统内核，多流轮询阻塞。系统内核到程序空间，阻塞。
+信号驱动IO模型：硬件到系统内核，信号回调不阻塞，系统内核到程序空间，阻塞。
+异步IO模型:硬件到系统内核，信号回调不阻塞。系统内核到程序空间，信号回调不阻塞
