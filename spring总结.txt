@@ -157,3 +157,119 @@ Adivce 通知，完成切面回调封装
 JdkDynamicAopProxy 使用jdk生成代理类的工具
 CglibAopProxy 使用Cglib生成代理类的工具
 DefaultAopProxyFactory
+
+
+
+MVC源码流程
+
+DispatcherServlet init()方法， 初始化九大组件
+
+DispacherServlet doService()方法
+
+getHandler 拿到HandlerMapping chain
+getHandlerAdapter（handlerMapping）
+adpter.handler() --->ModelAndView
+processDispatchResult() -->view.render()
+
+springMVC优化使用点
+1.Controller如果能保持单例，尽量使用的单例，
+2.处理Request的方法中的形参务必加上@RequestParam注解（申明式的编程可以加速程序处理）
+3.缓存URL
+
+
+spring5新特性面试点
+1.升级JDK8,j2EE7
+2.反应式的编程  netty
+3.全面支持注解编程
+4.支持函数式编程
+5.全面支持REST风格配置
+6.对http2.0全面支持
+7.Kotlin和Spring WebFlux Flux<> Mono<>
+8.可以直接使用Lambda表达式来注册Bean
+9.Spring WebMVC全面最新的ServletAPI
+10junit5直接执行并发测试
+11丢弃hibernate3/4,只支持hibernate5，对Portlet,Velocity,XMlBeans、JDO、Guava终止支持
+12spring核心容器坐了一些更新@Nullable、Logback
+
+spring经典面试题
+1.spring框架能给我们带来哪些好处？
+答：简化开发，解放双手
+提供了内置解决方案BOP,IOC，AOP思想，
+声明式事务管理TransactionManager，
+提供诸多工具类，jdbcTemplate,BeanUtils,RedisTemplate等
+
+2.BeanFactory和ApplicationContext有什么区别？
+答：ApplicationContext是Beanfactory的实现类
+2.BeanFactory是顶层设计(抽象)，而ApplicationContext是user interface
+3.ApplicationContext功能丰富，api是最全的，一般会认为ApplicationContext就是IOC
+4.IOC的真正功能实现时在DefaultListableBeanFactory类中完成的
+
+3.请解释一下Spring Bean的生命周期
+所谓生命周期，从创建，到调用，到销毁
+如果说singleton 从spring容器的启动都spring容器的销毁，如果是延迟加载，在调用前创建对象
+prototype 在调用前创建，调用后销毁
+作用域决定了生命周期的长短
+
+4.Spring Bean的作用域之间的区别
+singleton 每个quest请求，只有一个实例
+prototype 全局的，每次都是新的实例
+request 每个quest请求，都会有对应的实例，quest请求之间发生作用
+session 整个回话请求，只有一个实例，session之间生效，一般默认为30分钟
+global-session application 可以理解为容器中的一个应用。(spring5 不支持)
+
+5.Spring中Bean是线程安全的吗？
+spring bean本身没有所谓安不安全，spring只是负责bean的生成，是否线程安全和自己写的代码有关
+
+6.请问spring中用到哪些设计模式？
+单例模式（singleton），多例模式（prototype），工厂模式（Factory），装饰器模式，动态代理模式，
+抽象模板方法模式,委派模式，适配器模式，包装器模式
+
+7.Spring,Springboot,Spring Cloud到底有什么区别？
+Spring已有的生态，它完成了我的日常开发的所有的功能开发，一个spring打天下。
+
+SpringBoot,简化开发，spring减的还不够，配置文件很头疼，SpringBoot集成了很多中间件，有很多默认的自动化配置方便，
+整个应用开发。全面去Servlet化，能够自运行，部署也简单了。版本控制也方便了，一个jar打天下。
+官方层面提供了一套脚手架，一键搭建，节省时间,构建服务快速(即微服务)。
+
+SpringCloud:正式进军分布式
+	注册中心，服务发现，服务负载，熔断，监控，配置中心，服务网关。
+	打造一个java开发web生态,一站式
+	springclound依赖springboot,springboot依赖spring	
+	
+	Dubbo RPC,分布式服务治理框架， Netty，Spring,Zookeeper,Ngin...
+
+8.Spring事务怎么传播？
+为什么spring事务能够挂起，
+规则先不说，看配置看的出来
+
+TransactionManager,代理模式
+
+pool
+
+Before(){
+	connection.setAutoCommit(false);
+}
+
+execute()原始的逻辑，拿到的是DataSource， connection
+
+after(){
+     if(condtion){
+	conn.rollback();
+     }else {
+	conn.commit();
+     }
+}
+finaylly{
+}
+
+9FactoryBean和BeanFacotry区别？
+BeanFacotry就是ioc的顶层设计，FactoryBean是用来构建Bean的包装类，通过&name来获取一个能生产或者修饰对象生成的工厂Bean，
+但对FactoryBean而言，这个Bean不是简单的Bean，它专门来构建生产某个bean
+
+10.一个方法内，for循环内重复操作数据库，是用一个链接还是多个连接
+千万不在一个方法内for循环去查询数据库，因为多次连接数据库，导致连接池的数量不可控，循环的次数未知
+
+解决方案:
+1.分页
+2.缓存
+3.联合查询
